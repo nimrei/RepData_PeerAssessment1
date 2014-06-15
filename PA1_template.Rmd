@@ -1,7 +1,5 @@
 # Reproducible Research: Peer Assessment 1
 
-#TODO: Test and proof-read!
-
 ## Loading and preprocessing the data
 
 ```{r loaddata}
@@ -15,7 +13,7 @@ For this part of the assignment, you can ignore the missing values in the datase
 ### Histogram of the total number of steps per day
 ```{r}
 library(ggplot2)
-total.steps <- tapply(raw.data$steps, data$date, sum, na.rm=T)
+total.steps <- tapply(raw.data$steps, raw.data$date, FUN=sum, na.rm=T)
 qplot(total.steps, binwidth=1000, xlab="total number of steps per day")
 ```
 
@@ -77,8 +75,11 @@ median(total.steps.filled)
 ```
 
 ### Is there a difference by using this filling strategy?
-Mean and median values are higher after filling in missing data. This is dude to the fact that there are some days where all `steps` values are `NA` across all intervals. Normally the total number of steps for these days would be calculated as 0. By replacing the missing values with the mean `steps` over the associated `interval` the 0 values are now removed from the total number of steps taken per day, resulting in a graph with a greater frequency of higher values.
+Mean and median values are higher after filling in missing data. This is due to the fact that there are some days where all `steps` values are `NA` across all intervals. 
 
+Normally the total number of steps for these days would be calculated as 0. However, by replacing missing values with the mean `steps` over the associated `interval`, the 0 values are now near-removed from the total number of steps taken per day. 
+
+The resulting graph now has a greater frequency of values around the mean in the unfilled dataset (now that it also includes the previously unfilled `NA` entries). As such not only is the mean higher, but the median is far more likely to be equal to the mean.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -96,7 +97,7 @@ weekday.category <- function(date) {
 }
 filled.data$day <- sapply(as.Date(filled.data$date), weekday.category)
 ```
-## Create a panel plot containing a time series plot of 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+### Create a panel plot containing a time series plot of 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 ```{r}
 filled.averages <- aggregate(steps ~ interval + day, data=filled.data, mean)
 ggplot(filled.averages, aes(interval, steps)) + geom_line() + facet_grid(day ~ .) +
